@@ -11,12 +11,12 @@ import (
 type CustomClaims struct {
 	UserID   string `json:"userid"`
 	Email    string `json:"email"`
-	Role    string `json:"role"`
+	Role     string `json:"role"`
 	Metadata string `json:"metadata"`
 	jwt.RegisteredClaims
 }
 
-func GenerateJWTToken(key_sign, issuer string, expired int, data CustomClaims) (string, error) {
+func GenerateJWTToken(key_sign, issuer string, expired int, data CustomClaims) (string, *CustomClaims, error) {
 	signingKey := []byte(key_sign)
 	// Create the claims
 	claims := CustomClaims{
@@ -34,9 +34,9 @@ func GenerateJWTToken(key_sign, issuer string, expired int, data CustomClaims) (
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 	res, err := token.SignedString(signingKey)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
-	return res, nil
+	return res, &claims, nil
 }
 
 func TokenExpiredTime(key, token_string string) float64 {
